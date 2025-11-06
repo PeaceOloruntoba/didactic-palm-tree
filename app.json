@@ -1,18 +1,23 @@
 {
-  "scheme": "acme",
-  "userInterfaceStyle": "automatic",
-  "orientation": "default",
-  "web": {
-    "output": "static"
-  },
-  "plugins": [
-    [
-      "expo-router",
-      {
-        "origin": "https://n"
-      }
-    ]
-  ],
-  "name": "didactic-palm-tree",
-  "slug": "didactic-palm-tree"
+  "expo": {
+    "name": "didactic-palm-tree",
+    "slug": "didactic-palm-tree",
+    "scheme": "acme",
+    "userInterfaceStyle": "automatic",
+    "orientation": "default",
+    "web": {
+      "output": "static"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://n"
+        }
+      ]
+    ],
+    "android": {
+      "package": "com.peace.didacticpalmtree"
+    }
+  }
 }
