@@ -18,6 +18,14 @@
     ],
     "android": {
       "package": "com.peace.didacticpalmtree"
+    },
+    "extra": {
+      "router": {
+        "origin": "https://n"
+      },
+      "eas": {
+        "projectId": "e14aecfa-e675-41d3-b0ca-9a7a3593f6b3"
+      }
     }
   }
 }
