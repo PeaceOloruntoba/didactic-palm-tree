@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "didactic-palm-tree",
-    "slug": "didactic-palm-tree",
+    "name": "my-meal-planner",
+    "slug": "my-meal-planner",
     "scheme": "acme",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
