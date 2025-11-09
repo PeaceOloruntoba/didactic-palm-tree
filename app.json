@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-meal-planner",
-    "slug": "my-meal-planner",
+    "name": "didactic-palm-tree",
+    "slug": "didactic-palm-tree",
     "scheme": "acme",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
@@ -16,8 +16,22 @@
         }
       ]
     ],
+    "icon": "src/assets/images/logo.jpg",
+    "splash": {
+      "image": "src/assets/images/logo.jpg",
+      "backgroundColor": "#1f444c",
+      "resizeMode": "contain"
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#1f444c",
+      "translucent": false,
+      "barStyle": "light-content"
+    },
     "android": {
-      "package": "com.peace.didacticpalmtree"
+      "package": "com.peace.didacticpalmtree",
+      "adaptiveIcon": {
+        "backgroundColor": "#1f444c"
+      }
     },
     "extra": {
       "router": {
