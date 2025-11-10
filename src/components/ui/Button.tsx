@@ -15,14 +15,14 @@ export function Button({ title, onPress, className = "", disabled, loading }: Pr
     <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
-      className={`h-12 rounded-md bg-black items-center justify-center ${
+      className={`h-12 rounded-md bg-primary items-center justify-center ${
         isDisabled ? "opacity-50" : ""
       } ${className}`}
     >
       {loading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color="#e9be6f" />
       ) : (
-        <Text className="text-white font-medium">{title}</Text>
+        <Text className="text-secondary font-medium">{title}</Text>
       )}
     </TouchableOpacity>
   );

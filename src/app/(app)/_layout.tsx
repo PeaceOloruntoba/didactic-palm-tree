@@ -22,9 +22,11 @@ export default function AppTabsLayout() {
       screenOptions={({ route }) => ({
         headerShown: true,
         headerTitleStyle: { fontWeight: "700" },
-        tabBarActiveTintColor: "#000",
-        tabBarInactiveTintColor: "#9ca3af",
-        tabBarStyle: { paddingTop: 4, height: 60 },
+        headerStyle: { backgroundColor: "#1f444c" },
+        headerTintColor: "#e9be6f",
+        tabBarActiveTintColor: "#e9be6f",
+        tabBarInactiveTintColor: "#c77138",
+        tabBarStyle: { paddingTop: 4, height: 60, backgroundColor: "#1f444c", borderTopColor: "#16333a" },
         tabBarIcon: ({ color, size }) => {
           const map: Record<string, keyof typeof Ionicons.glyphMap> = {
             dashboard: "home-outline",
@@ -50,7 +52,7 @@ export default function AppTabsLayout() {
                 style={{ paddingHorizontal: 8 }}
                 accessibilityLabel="Open planner"
               >
-                <Ionicons name="calendar-outline" size={22} color="#111827" />
+                <Ionicons name="calendar-outline" size={22} color="#e9be6f" />
               </Pressable>
             </View>
           ),
@@ -68,7 +70,7 @@ export default function AppTabsLayout() {
                 style={{ paddingHorizontal: 8 }}
                 accessibilityLabel="Add nutrition"
               >
-                <Ionicons name="add-circle-outline" size={22} color="#111827" />
+                <Ionicons name="add-circle-outline" size={22} color="#e9be6f" />
               </Pressable>
             </View>
           ),
