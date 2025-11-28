@@ -17,7 +17,7 @@ export default function AppTabsLayout() {
 
   return (
     <>
-      <StatusBar style="light" hidden={false} translucent={false} />
+      <StatusBar style="dark" backgroundColor="#ffffff" translucent={false} />
       <Tabs
       screenOptions={({ route }) => ({
         headerShown: true,
@@ -63,17 +63,6 @@ export default function AppTabsLayout() {
         name="nutrition"
         options={{
           title: "Nutrition",
-          headerRight: () => (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Pressable
-                onPress={() => router.push("/(modals)/nutrition-new")}
-                style={{ paddingHorizontal: 8 }}
-                accessibilityLabel="Add nutrition"
-              >
-                <Ionicons name="add-circle-outline" size={22} color="#e9be6f" />
-              </Pressable>
-            </View>
-          ),
         }}
       />
       <Tabs.Screen name="shopping" options={{ title: "Shopping" }} />

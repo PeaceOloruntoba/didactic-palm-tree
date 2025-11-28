@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
 import { Screen } from "../../components/layout/Screen";
 import { Input } from "../../components/ui/Input";
 import { Loading } from "../../components/ui/Loading";
@@ -14,7 +14,7 @@ export default function Nutrition() {
   const [error, setError] = useState<string | undefined>();
   const [items, setItems] = useState<any[]>([]);
   const [recipeId, setRecipeId] = useState<string>("");
-  const [recipes, setRecipes] = useState<{ id: number; name: string }[]>([]);
+  const [recipes, setRecipes] = useState<{ id: number; name: string; image_url?: string; category?: string }[]>([]);
 
   const load = async () => {
     setLoading(true);
@@ -54,18 +54,29 @@ export default function Nutrition() {
         <FlatList
           data={items}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <Card className="mx-4 my-2">
-              <View className="px-3 py-3">
-                <Text className="text-emerald-700 font-semibold mb-1">
-                  {`#${item.recipe_id ?? "-"} - ${recipes.find((r) => r.id === item.recipe_id)?.name ?? "-"}`}
-                </Text>
-                <Text className="text-gray-600">
-                  {`Kcal ${item.calories} • P ${item.protein_grams}g • C ${item.carbs_grams}g • F ${item.fat_grams}g`}
-                </Text>
-              </View>
-            </Card>
-          )}
+          renderItem={({ item }) => {
+            const recipe = recipes.find((r) => r.id === item.recipe_id);
+            return (
+              <Card className="mx-4 my-2">
+                <View className="flex-row items-center gap-3 px-3 py-3">
+                  {recipe?.image_url ? (
+                    <Image
+                      source={{ uri: recipe.image_url }}
+                      style={{ width: 56, height: 56, borderRadius: 8 }}
+                    />
+                  ) : null}
+                  <View className="flex-1">
+                    <Text className="text-emerald-700 font-semibold mb-1">
+                      {`#${item.recipe_id ?? "-"} - ${recipe?.name ?? "-"}`}
+                    </Text>
+                    <Text className="text-gray-600">
+                      {`Kcal ${item.calories} • P ${item.protein_grams}g • C ${item.carbs_grams}g • F ${item.fat_grams}g`}
+                    </Text>
+                  </View>
+                </View>
+              </Card>
+            );
+          }}
           onRefresh={load}
           refreshing={loading}
         />

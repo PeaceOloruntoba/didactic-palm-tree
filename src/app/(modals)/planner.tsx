@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native";
 import { Screen } from "../../components/layout/Screen";
 import { Button } from "../../components/ui/Button";
 import { Loading } from "../../components/ui/Loading";
@@ -19,6 +19,7 @@ export default function Planner() {
   const [error, setError] = useState<string | undefined>();
   const [plan, setPlan] = useState<Plan>({});
   const [options, setOptions] = useState<Option[]>([]);
+  const [openKey, setOpenKey] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -59,39 +60,43 @@ export default function Planner() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {error ? <ErrorView message={error} /> : null}
-        {DAYS.map((day) => (
-          <Card key={day} className="mb-4 p-3">
-            <Text className="font-semibold text-lg mb-2">{day}</Text>
-            {SLOTS.map((slot) => (
-              <View key={slot} className="mb-3">
-                <View className="flex-row items-center mb-1">
-                  <View className="px-2 py-0.5 rounded-full bg-emerald-100 mr-2">
-                    <Text className="text-emerald-700 text-xs font-medium capitalize">{slot}</Text>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ padding: 16 }} keyboardShouldPersistTaps="handled">
+          {error ? <ErrorView message={error} /> : null}
+          {DAYS.map((day) => (
+            <Card key={day} className="mb-4 p-3">
+              <Text className="font-semibold text-lg mb-2">{day}</Text>
+              {SLOTS.map((slot) => (
+                <View key={slot} className="mb-3">
+                  <View className="flex-row items-center mb-1">
+                    <View className="px-2 py-0.5 rounded-full bg-emerald-100 mr-2">
+                      <Text className="text-emerald-700 text-xs font-medium capitalize">{slot}</Text>
+                    </View>
+                    <Text className="text-gray-500 text-xs">Pick a recipe</Text>
                   </View>
-                  <Text className="text-gray-500 text-xs">Pick a recipe</Text>
+                  <SearchableSelect
+                    options={options}
+                    value={plan[day]?.[slot] ? { id: plan[day]![slot]!.id!, name: plan[day]![slot]!.name || "" } : null}
+                    placeholder={`Pick a recipe for ${slot}`}
+                    open={openKey === `${day}:${slot}`}
+                    onOpenChange={(o) => setOpenKey(o ? `${day}:${slot}` : (openKey === `${day}:${slot}` ? null : openKey))}
+                    onChange={(opt) =>
+                      setPlan((prev) => ({
+                        ...prev,
+                        [day]: {
+                          ...(prev[day] || {}),
+                          [slot]: opt ? { id: Number(opt.id), name: opt.name } : null,
+                        },
+                      }))
+                    }
+                  />
                 </View>
-                <SearchableSelect
-                  options={options}
-                  value={plan[day]?.[slot] ? { id: plan[day]![slot]!.id!, name: plan[day]![slot]!.name || "" } : null}
-                  placeholder={`Pick a recipe for ${slot}`}
-                  onChange={(opt) =>
-                    setPlan((prev) => ({
-                      ...prev,
-                      [day]: {
-                        ...(prev[day] || {}),
-                        [slot]: opt ? { id: Number(opt.id), name: opt.name } : null,
-                      },
-                    }))
-                  }
-                />
-              </View>
-            ))}
-          </Card>
-        ))}
-        <Button title="Save plan" onPress={save} />
-      </ScrollView>
+              ))}
+            </Card>
+          ))}
+          <Button title="Save plan" onPress={save} />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }

@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/Button";
 import { useAuth } from "../../store/auth";
 
 export default function Settings() {
-  const { user, logout } = useAuth();
+  const { user, logout, logoutAll } = useAuth();
 
   return (
     <Screen>
@@ -23,6 +23,16 @@ export default function Settings() {
             Alert.alert("Logout", "Are you sure?", [
               { text: "Cancel", style: "cancel" },
               { text: "Logout", style: "destructive", onPress: () => logout() },
+            ]);
+          }}
+        />
+        <Button
+          title="Logout all devices"
+          className="bg-red-700"
+          onPress={() => {
+            Alert.alert("Logout all", "Logout from all devices?", [
+              { text: "Cancel", style: "cancel" },
+              { text: "Logout all", style: "destructive", onPress: () => logoutAll() },
             ]);
           }}
         />

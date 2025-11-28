@@ -9,12 +9,19 @@ type Props = {
   value: Option | null | undefined;
   onChange: (opt: Option | null) => void;
   placeholder?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
-export function SearchableSelect({ options, value, onChange, placeholder }: Props) {
+export function SearchableSelect({ options, value, onChange, placeholder, open: controlledOpen, onOpenChange }: Props) {
   const [q, setQ] = useState(value?.name || "");
   const [debounced, setDebounced] = useState(q);
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isOpen = controlledOpen ?? uncontrolledOpen;
+  const setOpen = (v: boolean) => {
+    if (controlledOpen === undefined) setUncontrolledOpen(v);
+    onOpenChange?.(v);
+  };
 
   const filtered = useMemo(() => {
     const term = debounced.trim().toLowerCase();
@@ -38,13 +45,12 @@ export function SearchableSelect({ options, value, onChange, placeholder }: Prop
         placeholder={placeholder}
         value={q}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
         onChangeText={(t) => {
           setQ(t);
           if (!t) onChange(null);
         }}
       />
-      {open && (
+      {isOpen && (
         <View className="mt-1 rounded-md border border-gray-200 bg-white max-h-64 shadow-sm">
           <ScrollView keyboardShouldPersistTaps="always">
             {filtered.map((item) => (

@@ -19,6 +19,7 @@ type Actions = {
   verifyOtp: (payload: { email: string; code: string }) => Promise<void>;
   login: (payload: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   forgotPassword: (payload: { email: string }) => Promise<void>;
   resetPassword: (payload: { email: string; code: string; password: string }) => Promise<void>;
   fetchMe: () => Promise<void>;
@@ -73,8 +74,10 @@ export const useAuth = create<State & Actions>((set, get) => ({
     try {
       const { data } = await http.post("/auth/login", payload);
       const token = data?.token as string | undefined;
+      const refresh = (data?.refresh_token as string | undefined) || undefined;
       if (token) {
         await AsyncStorage.setItem(STORAGE_KEYS.token, token);
+        if (refresh) await AsyncStorage.setItem(STORAGE_KEYS.refresh, refresh);
         set({ token });
         await get().fetchMe();
       } else {
@@ -94,6 +97,17 @@ export const useAuth = create<State & Actions>((set, get) => ({
       await http.post("/auth/logout").catch(() => {});
     } finally {
       await AsyncStorage.removeItem(STORAGE_KEYS.token);
+      await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
+      set({ token: null, user: null });
+    }
+  },
+
+  logoutAll: async () => {
+    try {
+      await http.post("/auth/logout-all").catch(() => {});
+    } finally {
+      await AsyncStorage.removeItem(STORAGE_KEYS.token);
+      await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
       set({ token: null, user: null });
     }
   },
@@ -130,6 +144,7 @@ export const useAuth = create<State & Actions>((set, get) => ({
     } catch (e: any) {
       // If unauthorized, clear session
       await AsyncStorage.removeItem(STORAGE_KEYS.token);
+      await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
       set({ token: null, user: null });
     } finally {
       set({ loading: false });
