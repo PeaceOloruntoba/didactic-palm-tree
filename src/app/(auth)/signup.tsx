@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -10,6 +10,13 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referral, setReferral] = useState("");
+  const params = useLocalSearchParams<{ referralId?: string; ref?: string }>();
+
+  useEffect(() => {
+    const ref = (params.referralId as string) || (params.ref as string) || "";
+    if (ref) setReferral(ref);
+  }, [params.referralId, params.ref]);
 
   return (
     <View className="flex-1 px-4 justify-center gap-4">
@@ -24,12 +31,13 @@ export default function Signup() {
         onChangeText={setEmail}
       />
       <Input placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
+      <Input placeholder="Referral code (optional)" value={referral} onChangeText={setReferral} />
       <Button
         title="Sign up"
         loading={loading}
         onPress={async () => {
           clearError();
-          const res = await register({ email, password, name });
+          const res = await register({ email, password, name, referral_code: referral.trim() || undefined } as any);
           if (res) router.push({ pathname: "/(auth)/verify-otp", params: { email } });
         }}
       />

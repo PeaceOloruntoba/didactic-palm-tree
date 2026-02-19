@@ -31,9 +31,9 @@ export default function AppTabsLayout() {
           const map: Record<string, keyof typeof Ionicons.glyphMap> = {
             dashboard: "home-outline",
             recipes: "restaurant-outline",
-            nutrition: "nutrition-outline",
             shopping: "cart-outline",
             pantry: "bag-outline",
+            billing: "card-outline",
             settings: "settings-outline",
           };
           const name = map[route.name] || "ellipse-outline";
@@ -58,15 +58,11 @@ export default function AppTabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="ai" options={{ title: "AI" }} />
       <Tabs.Screen name="recipes" options={{ title: "Recipes" }} />
-      <Tabs.Screen
-        name="nutrition"
-        options={{
-          title: "Nutrition",
-        }}
-      />
       <Tabs.Screen name="shopping" options={{ title: "Shopping" }} />
       <Tabs.Screen name="pantry" options={{ title: "Pantry" }} />
+      <Tabs.Screen name="billing" options={{ title: "Billing" }} />
       <Tabs.Screen name="settings" options={{ title: "Settings" }} />
       </Tabs>
     </>

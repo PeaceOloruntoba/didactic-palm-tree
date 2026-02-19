@@ -44,4 +44,10 @@ export const api = {
             }
         ),
   },
+  ai: {
+    ensureSession: () => http.post("/ai/session").then((r) => (r.data?.id as string)),
+    messages: (sessionId: string) => http.get(`/ai/sessions/${sessionId}/messages`).then((r) => r.data as Array<{ id: string; role: string; content: any; created_at: string }>),
+    chat: (message: string, stream = false) => http.post("/ai/chat", { message, stream }).then((r) => r.data as { message?: { role: string; text: string }; usage?: any }),
+    plan: (options?: { prompt?: string; budget?: number; max_prep_minutes?: number }) => http.post("/ai/plan", options || {}).then((r) => r.data as { plan: any; artifact_id: string; usage?: any }),
+  },
 };
