@@ -1,10 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Alert, FlatList, Text, View, Pressable, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  Alert,
+  FlatList,
+  Text,
+  View,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Screen } from "../../components/layout/Screen";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
-import { Loading } from "../../components/ui/Loading";
 import { Empty } from "../../components/ui/Empty";
 import { ErrorView } from "../../components/ui/ErrorView";
 import { ListItem } from "../../components/ui/ListItem";
@@ -17,33 +25,42 @@ export default function KitchenScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>();
   const [items, setItems] = useState<any[]>([]);
-  
+
   // Form State
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
 
-  const load = async () => {
-    setLoading(true);
-    setError(undefined);
-    try {
-      const data = activeTab === "shopping" 
-        ? await api.shopping.list() 
-        : await api.pantry.list();
-      setItems(data || []);
-    } catch (e: any) {
-      setError(e?.response?.data?.message || `Failed to load ${activeTab}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Memoized load function to prevent unnecessary recreations
+  const load = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      setError(undefined);
+      try {
+        const data =
+          activeTab === "shopping"
+            ? await api.shopping.list()
+            : await api.pantry.list();
+        setItems(data || []);
+      } catch (e: any) {
+        const msg = e?.response?.data?.errorMessage || e?.response?.data?.message || `Failed to load ${activeTab}`;
+        setError(msg);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [activeTab],
+  );
 
   useEffect(() => {
     load();
-  }, [activeTab]);
+  }, [load]);
 
   const handleAdd = async () => {
-    if (!name) return Alert.alert("Required", "Item name is required");
+    if (!name.trim())
+      return Alert.alert("Required", "Please enter an item name.");
+
+    setLoading(true);
     try {
       if (activeTab === "shopping") {
         await api.shopping.create({ name, quantity });
@@ -53,111 +70,164 @@ export default function KitchenScreen() {
       setName("");
       setQuantity("");
       setUnit("");
-      load();
+      // Reload without the full-screen spinner for better UX
+      await load(false);
     } catch (e: any) {
-      Alert.alert("Error", "Failed to add item");
+      Alert.alert("Error", "Failed to add item. Please try again.");
+      setLoading(false);
     }
   };
 
   const handleRemove = async (id: string | number) => {
     try {
-      activeTab === "shopping" 
-        ? await api.shopping.remove(id) 
+      activeTab === "shopping"
+        ? await api.shopping.remove(id)
         : await api.pantry.remove(id);
-      load();
+      // Optimistic update or quick reload
+      setItems((prev) => prev.filter((item) => item.id !== id));
     } catch (e: any) {
-      Alert.alert("Error", "Failed to remove item");
+      Alert.alert("Error", "Failed to remove item.");
     }
   };
 
   return (
     <Screen>
-      <View className="flex-1 bg-white">
-        {/* Tab Switcher */}
-        <View className="px-6 pt-4 pb-2">
-          <View className="flex-row bg-slate-100 p-1 rounded-2xl">
-            {(["shopping", "pantry"] as Tab[]).map((tab) => (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      >
+        <View className="flex-1 bg-white">
+          {/* Custom Segmented Control */}
+          <View className="px-6 pt-4 pb-2">
+            <View className="flex-row bg-slate-100 p-1.5 rounded-2xl">
               <Pressable
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                className={`flex-1 py-3 rounded-xl items-center ${
-                  activeTab === tab ? "bg-white shadow-sm" : ""
-                }`}
+                onPress={() => {
+                  if (activeTab !== "shopping") setActiveTab("shopping");
+                }}
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 16,
+                  alignItems: "center",
+                  backgroundColor: activeTab === "shopping" ? "#ffffff" : "transparent",
+                  opacity: loading ? 0.6 : 1,
+                }}
               >
-                <Text className={`font-black uppercase tracking-widest text-[10px] ${
-                  activeTab === tab ? "text-primary" : "text-slate-400"
-                }`}>
-                  {tab === "shopping" ? "Shopping List" : "My Pantry"}
+                <Text
+                  className={`font-black uppercase tracking-widest text-[10px] ${activeTab === "shopping" ? "text-primary" : "text-slate-400"}`}
+                >
+                  Shopping List
                 </Text>
               </Pressable>
-            ))}
+              <Pressable
+                onPress={() => {
+                  if (activeTab !== "pantry") setActiveTab("pantry");
+                }}
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 16,
+                  alignItems: "center",
+                  backgroundColor: activeTab === "pantry" ? "#ffffff" : "transparent",
+                  opacity: loading ? 0.6 : 1,
+                }}
+              >
+                <Text
+                  className={`font-black uppercase tracking-widest text-[10px] ${activeTab === "pantry" ? "text-primary" : "text-slate-400"}`}
+                >
+                  My Pantry
+                </Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
 
-        {/* Dynamic Add Form */}
-        <View className="p-6 gap-3">
-          <Input 
-            placeholder={activeTab === "shopping" ? "Need to buy..." : "Stocking up on..."}
-            value={name} 
-            onChangeText={setName}
-            className="h-14 bg-slate-50 border-slate-100 px-5 rounded-2xl font-bold text-primary"
-          />
-          <View className="flex-row gap-3">
-            <Input 
-              placeholder="Qty" 
-              value={quantity} 
-              onChangeText={setQuantity}
-              className="flex-1 h-14 bg-slate-50 border-slate-100 px-5 rounded-2xl font-bold text-primary"
+          {/* Quick Add Form */}
+          <View className="p-6 gap-3">
+            <Input
+              placeholder={
+                activeTab === "shopping"
+                  ? "What do you need?"
+                  : "What's in the kitchen?"
+              }
+              value={name}
+              onChangeText={setName}
+              className="h-14 bg-slate-50 border-slate-100 px-5 rounded-2xl font-bold text-primary"
             />
-            {activeTab === "pantry" && (
-              <Input 
-                placeholder="Unit (kg)" 
-                value={unit} 
-                onChangeText={setUnit}
+            <View className="flex-row gap-3">
+              <Input
+                placeholder="Qty"
+                value={quantity}
+                onChangeText={setQuantity}
                 className="flex-1 h-14 bg-slate-50 border-slate-100 px-5 rounded-2xl font-bold text-primary"
               />
-            )}
-            <Pressable 
-              onPress={handleAdd}
-              className="h-14 w-14 bg-primary items-center justify-center rounded-2xl shadow-lg shadow-primary/20"
-            >
-              <Ionicons name="add" size={28} color="#e9be6f" />
-            </Pressable>
-          </View>
-          {error && <ErrorView message={error} />}
-        </View>
-
-        {/* List Section */}
-        <View className="flex-1 px-4">
-          <View className="flex-row items-center px-2 mb-4">
-             <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
-                Current Inventory
-             </Text>
-             <View className="h-[1px] flex-1 bg-slate-100 ml-4" />
-          </View>
-
-          {loading && items.length === 0 ? (
-            <Loading label={`Opening ${activeTab}...`} />
-          ) : (
-            <FlatList
-              data={items}
-              keyExtractor={(item) => String(item.id)}
-              showsVerticalScrollIndicator={false}
-              ListEmptyComponent={<Empty title={`Your ${activeTab} is empty`} subtitle="Add items above to start tracking." />}
-              renderItem={({ item }) => (
-                <ListItem
-                  title={item.name}
-                  subtitle={activeTab === "shopping" ? item.quantity : `${item.quantity ?? ""} ${item.unit ?? ""}`.trim()}
-                  onDelete={() => handleRemove(item.id)}
+              {activeTab === "pantry" && (
+                <Input
+                  placeholder="Unit"
+                  value={unit}
+                  onChangeText={setUnit}
+                  className="flex-1 h-14 bg-slate-50 border-slate-100 px-5 rounded-2xl font-bold text-primary"
                 />
               )}
-              onRefresh={load}
-              refreshing={loading}
-              contentContainerStyle={{ paddingBottom: 100 }}
-            />
-          )}
+              <Pressable
+                onPress={handleAdd}
+                disabled={loading}
+                className="h-14 w-14 bg-primary items-center justify-center rounded-2xl shadow-lg shadow-primary/20"
+              >
+                {loading ? (
+                  <ActivityIndicator color="#e9be6f" size="small" />
+                ) : (
+                  <Ionicons name="add" size={28} color="#e9be6f" />
+                )}
+              </Pressable>
+            </View>
+            {error && <ErrorView message={error} />}
+          </View>
+
+          {/* List Content */}
+          <FlatList
+            data={items}
+            key={activeTab}
+            keyExtractor={(item) => String(item.id)}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 24,
+              paddingBottom: 120,
+            }}
+            ListHeaderComponent={
+              <View className="flex-row items-center mb-4">
+                <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+                  {activeTab === "shopping" ? "To Buy" : "In Stock"}
+                </Text>
+                <View className="h-[1px] flex-1 bg-slate-100 ml-4" />
+              </View>
+            }
+            ListEmptyComponent={
+              !loading ? (
+                <Empty
+                  title={`${activeTab === "shopping" ? "Empty List" : "Empty Pantry"}`}
+                  subtitle={`Start building your kitchen architecture by adding items above.`}
+                />
+              ) : null
+            }
+            renderItem={({ item }) => (
+              <ListItem
+                title={item.name}
+                subtitle={
+                  activeTab === "shopping"
+                    ? item.quantity
+                    : `${item.quantity ?? ""} ${item.unit ?? ""}`.trim()
+                }
+                onDelete={() => handleRemove(item.id)}
+              />
+            )}
+            onRefresh={() => load(false)}
+            refreshing={loading}
+          />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Screen>
   );
 }

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL, STORAGE_KEYS } from "../config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
 
 export const http = axios.create({
   baseURL: API_BASE_URL,
@@ -30,9 +29,6 @@ http.interceptors.response.use(
       try {
         const msg = error?.response?.data?.errorMessage || "Subscription required";
         await AsyncStorage.setItem("paywall_reason", String(msg));
-      } catch {}
-      try {
-        router.push("/(app)/billing");
       } catch {}
       return Promise.reject(error);
     }

@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FlatList, Text, View } from "react-native";
-import { Screen } from "../../components/layout/Screen";
-import { Input } from "../../components/ui/Input";
-import { Loading } from "../../components/ui/Loading";
-import { Empty } from "../../components/ui/Empty";
-import { ErrorView } from "../../components/ui/ErrorView";
-import { ListItem } from "../../components/ui/ListItem";
-import { api } from "../../lib/api";
+import { Screen } from "../components/layout/Screen";
+import { Input } from "../components/ui/Input";
+import { Loading } from "../components/ui/Loading";
+import { Empty } from "../components/ui/Empty";
+import { ErrorView } from "../components/ui/ErrorView";
+import { ListItem } from "../components/ui/ListItem";
+import { api } from "../lib/api";
 
 export default function Recipes() {
   const [loading, setLoading] = useState(true);

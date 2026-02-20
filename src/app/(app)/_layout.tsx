@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AppTabsLayout() {
   const { token, hydrated, bootstrap } = useAuth();
@@ -13,7 +14,25 @@ export default function AppTabsLayout() {
     if (!hydrated) bootstrap();
   }, [hydrated]);
 
+  if (!hydrated) return null;
   if (hydrated && !token) return <Redirect href="/(auth)/login" />;
+
+  useEffect(() => {
+    let mounted = true;
+    const checkPaywall = async () => {
+      try {
+        const reason = await AsyncStorage.getItem("paywall_reason");
+        if (mounted && reason) {
+          await AsyncStorage.removeItem("paywall_reason");
+          setTimeout(() => router.replace("/(app)/more/billing"), 0);
+        }
+      } catch {}
+    };
+    checkPaywall();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>
@@ -104,24 +123,6 @@ export default function AppTabsLayout() {
             ),
           }}
         />
-
-        {/* Hidden internal routes */}
-        <Tabs.Screen
-          name="more/edit-profile"
-          options={{ href: null }} 
-        />
-        <Tabs.Screen
-          name="more/billing"
-          options={{ href: null }}
-        />
-        <Tabs.Screen
-          name="more/affiliate"
-          options={{ href: null }}
-        />
-        <Tabs.Screen name="recipes" options={{ href: null }} />
-        <Tabs.Screen name="pantry" options={{ href: null }} />
-        <Tabs.Screen name="billing" options={{ href: null }} />
-        <Tabs.Screen name="settings" options={{ href: null }} />
       </Tabs>
     </>
   );

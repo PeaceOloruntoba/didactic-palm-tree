@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 export default function MoreLayout() {
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style="light" translucent={false} backgroundColor="#1f444c" />
       
       <Stack
         screenOptions={{
@@ -13,12 +13,10 @@ export default function MoreLayout() {
           headerStyle: { 
             backgroundColor: "#1f444c", 
           },
-          // Fixed: Removed textTransform, fontStyle, and letterSpacing 
-          // as they often trigger TS errors in headerTitleStyle
-          headerTitleStyle: {
-            fontWeight: "900",
-            fontSize: 16,
-            color: "#e9be6f", 
+          headerTitleStyle: { 
+            fontWeight: "900", 
+            fontSize: 15,
+            color: "#e9be6f"
           },
           headerTintColor: "#e9be6f", 
           // Fixed: headerBackTitleVisible is usually an iOS-only property 
