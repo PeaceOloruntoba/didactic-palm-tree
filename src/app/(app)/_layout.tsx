@@ -41,16 +41,16 @@ export default function AppTabsLayout() {
         screenOptions={{
           headerShown: true,
           headerShadowVisible: false,
-          headerStyle: { 
+          headerStyle: {
             backgroundColor: "#1f444c",
           },
-          headerTitleStyle: { 
-            fontWeight: "900", 
-            textTransform: "uppercase", 
+          headerTitleStyle: {
+            fontWeight: "900",
+            textTransform: "uppercase",
             letterSpacing: 1.5,
             fontSize: 15,
             fontStyle: "italic",
-            color: "#e9be6f"
+            color: "#e9be6f",
           },
           tabBarActiveTintColor: "#e9be6f",
           tabBarInactiveTintColor: "rgba(233, 190, 111, 0.4)", // Faded version of your gold
@@ -68,7 +68,7 @@ export default function AppTabsLayout() {
             textTransform: "uppercase",
             letterSpacing: 1,
             marginTop: 4,
-          }
+          },
         }}
       >
         <Tabs.Screen
@@ -102,6 +102,22 @@ export default function AppTabsLayout() {
         />
 
         <Tabs.Screen
+          name="recipes"
+          options={{
+            headerShown: false,
+            title: "Recipes",
+            tabBarLabel: "Recipes",
+            tabBarIcon: ({ color }) => (
+              <Ionicons
+                name="ellipsis-horizontal-circle-outline"
+                size={22}
+                color={color}
+              />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
           name="shopping"
           options={{
             title: "Kitchen",
@@ -119,7 +135,11 @@ export default function AppTabsLayout() {
             title: "More",
             tabBarLabel: "More",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="ellipsis-horizontal-circle-outline" size={22} color={color} />
+              <Ionicons
+                name="ellipsis-horizontal-circle-outline"
+                size={22}
+                color={color}
+              />
             ),
           }}
         />

@@ -2,7 +2,36 @@ import { http } from "./http";
 
 export const api = {
   me: () => http.get("/users/me").then((r) => r.data),
-  recipes: () => http.get("/recipes").then((r) => r.data as { id: number; name: string; category?: string }[]),
+  recipes: () =>
+    http
+      .get("/recipes")
+      .then(
+        (r) =>
+          r.data as {
+            id: number;
+            name: string;
+            category?: string;
+            image_url?: string | null;
+            calories?: number | null;
+          }[]
+      ),
+  recipe: (id: string | number) =>
+    http
+      .get(`/recipes/${id}`)
+      .then((r) => r.data as {
+        id: number;
+        name: string;
+        category?: string;
+        image_url?: string | null;
+        description?: string | null;
+        details?: string | null;
+        full_nutrition?: {
+          calories?: number;
+          protein_grams?: number;
+          carbs_grams?: number;
+          fat_grams?: number;
+        } | null;
+      }),
   nutrition: (recipeId?: number) => http.get("/nutrition", { params: recipeId ? { recipeId } : undefined }).then((r) => r.data),
   nutritionById: (id: string | number) => http.get(`/nutrition/${id}`).then((r) => r.data),
   nutritionCreate: (body: any) => http.post("/nutrition", body).then((r) => r.data),
