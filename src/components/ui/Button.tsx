@@ -7,9 +7,10 @@ type Props = {
   className?: string;
   disabled?: boolean;
   loading?: boolean;
+  textClassName?: string;
 };
 
-export function Button({ title, onPress, className = "", disabled, loading }: Props) {
+export function Button({ title, onPress, className = "", disabled, loading, textClassName = "" }: Props) {
   const isDisabled = disabled || loading;
   return (
     <TouchableOpacity
@@ -22,7 +23,7 @@ export function Button({ title, onPress, className = "", disabled, loading }: Pr
       {loading ? (
         <ActivityIndicator color="#e9be6f" />
       ) : (
-        <Text className="text-secondary font-medium">{title}</Text>
+        <Text className={`text-secondary font-medium ${textClassName}`}>{title}</Text>
       )}
     </TouchableOpacity>
   );

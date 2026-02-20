@@ -5,7 +5,7 @@ export function Card({ children, className = "", ...rest }: PropsWithChildren<Vi
   return (
     <View
       {...rest}
-      className={`rounded-lg border border-gray-200 bg-white shadow-sm ${className}`}
+      className={`rounded-2xl bg-white shadow-lg shadow-primary ${className}`}
     >
       {children}
     </View>

@@ -50,4 +50,17 @@ export const api = {
     chat: (message: string, stream = false) => http.post("/ai/chat", { message, stream }).then((r) => r.data as { message?: { role: string; text: string }; usage?: any }),
     plan: (options?: { prompt?: string; budget?: number; max_prep_minutes?: number }) => http.post("/ai/plan", options || {}).then((r) => r.data as { plan: any; artifact_id: string; usage?: any }),
   },
+  profile: {
+    get: () => http.get("/profile").then((r) => r.data as { user: any; profile: Record<string, any> }),
+    update: (body: { first_name?: string; last_name?: string; bio?: string | null; values?: Record<string, any> }) =>
+      http.put("/profile", body).then((r) => r.data as { user: any; profile: Record<string, any> }),
+    updateCountry: (country_id: number | null) => http.patch("/profile/country", { country_id }).then((r) => r.data as { user: any }),
+  },
+  referrals: {
+    validate: (code: string) => http.get("/referrals/validate", { params: { code } }).then((r) => r.data as { valid: boolean; affiliate?: any }),
+    redeem: (code: string) => http.post("/referrals/redeem", { code }).then((r) => r.data),
+    request: (payload: { pitch?: string; social_links?: any }) => http.post("/referrals/request", payload).then((r) => r.data),
+    status: () => http.get("/referrals/request/status").then((r) => r.data as { status: string; code?: string | null }),
+    stats: () => http.get("/referrals/stats").then((r) => r.data as { total: number; applied: number; code: string | null }),
+  },
 };

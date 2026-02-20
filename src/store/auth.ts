@@ -3,7 +3,8 @@ import { http } from "../lib/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../config";
 
-export type User = { id: string; email: string; name?: string };
+export type User = { id: string; email: string; first_name?: string; last_name?: string; country_id?: number };
+export type Country = { id: number; name: string; code: string; currency: string };
 
 type State = {
   token: string | null;
@@ -11,11 +12,12 @@ type State = {
   loading: boolean;
   error: string | null;
   hydrated: boolean;
+  countries: Country[];
 };
 
 type Actions = {
   bootstrap: () => Promise<void>;
-  register: (payload: { email: string; password: string; name?: string }) => Promise<{ message: string; otp?: string }|void>;
+  register: (payload: { email: string; password: string; first_name: string; last_name: string; country_id: number; referral_code?: string }) => Promise<{ message: string; otp?: string }|void>;
   verifyOtp: (payload: { email: string; code: string }) => Promise<void>;
   login: (payload: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
@@ -23,6 +25,9 @@ type Actions = {
   forgotPassword: (payload: { email: string }) => Promise<void>;
   resetPassword: (payload: { email: string; code: string; password: string }) => Promise<void>;
   fetchMe: () => Promise<void>;
+  fetchCountries: () => Promise<void>;
+  fetchGoalKeys: () => Promise<string[]>;
+  setGoals: (goals: string[]) => Promise<boolean>;
   clearError: () => void;
 };
 
@@ -32,6 +37,7 @@ export const useAuth = create<State & Actions>((set, get) => ({
   loading: false,
   error: null,
   hydrated: false,
+  countries: [],
 
   bootstrap: async () => {
     try {
@@ -40,6 +46,7 @@ export const useAuth = create<State & Actions>((set, get) => ({
         set({ token });
         await get().fetchMe().catch(() => {});
       }
+      await get().fetchCountries().catch(() => {});
     } finally {
       set({ hydrated: true });
     }
@@ -148,6 +155,31 @@ export const useAuth = create<State & Actions>((set, get) => ({
       set({ token: null, user: null });
     } finally {
       set({ loading: false });
+    }
+  },
+  
+  fetchCountries: async () => {
+    try {
+      const { data } = await http.get("/countries");
+      set({ countries: data || [] });
+    } catch (e) {}
+  },
+  
+  fetchGoalKeys: async () => {
+    try {
+      const { data } = await http.get("/goals/keys");
+      return (data?.keys as string[]) || [];
+    } catch {
+      return [];
+    }
+  },
+  
+  setGoals: async (goals: string[]) => {
+    try {
+      await http.put("/goals", { goals });
+      return true;
+    } catch {
+      return false;
     }
   },
 

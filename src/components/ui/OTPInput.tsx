@@ -1,5 +1,10 @@
 import React, { useRef } from "react";
-import { TextInput, View } from "react-native";
+import {
+  TextInput,
+  View,
+  NativeSyntheticEvent,
+  TextInputKeyPressEventData,
+} from "react-native";
 
 type Props = {
   value: string;
@@ -11,8 +16,28 @@ export function OTPInput({ value, onChange, digits = 6 }: Props) {
   const refs = useRef<TextInput[]>([]);
   const chars = Array.from({ length: digits }, (_, i) => value[i] || "");
 
+  const handleChange = (t: string, i: number) => {
+    const newVal = value.split("");
+    newVal[i] = t.slice(-1);
+    const combined = newVal.join("");
+    onChange(combined);
+
+    if (t && i < digits - 1) {
+      refs.current[i + 1]?.focus();
+    }
+  };
+
+  const handleKeyPress = (
+    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    i: number,
+  ) => {
+    if (e.nativeEvent.key === "Backspace" && !value[i] && i > 0) {
+      refs.current[i - 1]?.focus();
+    }
+  };
+
   return (
-    <View className="flex-row justify-center gap-2">
+    <View className="flex-row justify-between w-full">
       {chars.map((c, i) => (
         <TextInput
           key={i}
@@ -20,14 +45,14 @@ export function OTPInput({ value, onChange, digits = 6 }: Props) {
             if (r) refs.current[i] = r;
           }}
           value={c}
-          onChangeText={(t) => {
-            const next = (value.slice(0, i) + (t.slice(-1) || "")).slice(0, i + 1) + value.slice(i + 1);
-            onChange(next.slice(0, digits));
-            if (t && i < digits - 1) refs.current[i + 1]?.focus();
-          }}
+          onChangeText={(t) => handleChange(t, i)}
+          onKeyPress={(e) => handleKeyPress(e, i)}
           keyboardType="number-pad"
           maxLength={1}
-          className="w-12 h-12 border border-gray-300 rounded-md text-center text-lg"
+          className={`w-[14%] h-16 rounded-2xl bg-slate-50 border text-center text-2xl font-black text-primary ${
+            c ? "border-[#e9be6f]" : "border-slate-100"
+          }`}
+          selectionColor="#e9be6f"
         />
       ))}
     </View>
