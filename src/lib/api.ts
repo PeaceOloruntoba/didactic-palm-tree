@@ -15,6 +15,19 @@ export const api = {
             calories?: number | null;
           }[]
       ),
+  recipesPaged: (page: number, perPage: number) =>
+    http
+      .get("/recipes", { params: { page, per_page: perPage } })
+      .then((r) => ({
+        items: (r.data as Array<{
+          id: number;
+          name: string;
+          category?: string;
+          image_url?: string | null;
+          calories?: number | null;
+        }>) || [],
+        total: Number(r.headers["x-total-count"] || 0),
+      })),
   recipe: (id: string | number) =>
     http
       .get(`/recipes/${id}`)

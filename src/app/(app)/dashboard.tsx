@@ -254,20 +254,83 @@ function MealSlot({
   icon: any;
   meal?: any;
 }) {
-  // Logic for tags
-  const isHighProtein = meal?.protein_grams > 30;
-  const isLowCarb = meal?.carbs_grams < 20 && meal?.carbs_grams !== undefined;
+  const [macros, setMacros] = useState<{ calories?: number; protein_grams?: number; carbs_grams?: number; fat_grams?: number } | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!meal) return;
+      const has =
+        typeof meal?.calories === "number" ||
+        typeof meal?.protein_grams === "number" ||
+        typeof meal?.carbs_grams === "number" ||
+        typeof meal?.fat_grams === "number";
+      if (!has && meal?.id) {
+        try {
+          const list = await api.nutrition(meal.id);
+          const n = Array.isArray(list) && list.length ? list[0] : null;
+          if (mounted && n) setMacros({ calories: n.calories, protein_grams: n.protein_grams, carbs_grams: n.carbs_grams, fat_grams: n.fat_grams });
+        } catch {}
+      } else {
+        setMacros({ calories: meal?.calories, protein_grams: meal?.protein_grams, carbs_grams: meal?.carbs_grams, fat_grams: meal?.fat_grams });
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [meal?.id]);
+
+  const p = (macros?.protein_grams ?? meal?.protein_grams ?? 0) as number;
+  const c = (macros?.carbs_grams ?? meal?.carbs_grams ?? 0) as number;
+  const f = (macros?.fat_grams ?? meal?.fat_grams ?? 0) as number;
+  const kcal = (macros?.calories ?? meal?.calories ?? 0) as number;
+  const isHighProtein = p > 30;
+  const isLowCarb = c < 20;
+  const isHighFat = f > 25;
+  const isHealthy = isHighProtein && !isHighFat && !isLowCarb === false ? true : isHighProtein && !isHighFat;
+  const isHighCarb = c > 45;
+  const isLowFat = f < 15;
+  const isHighCal = kcal > 600;
+  const isLowCal = kcal < 300;
+  const isBalanced = p >= 20 && c >= 20 && f >= 10 && !isHighFat && !isHighCarb;
+  const danger = isHighFat || isHighCarb || isHighCal;
+  const positive = isHealthy || isBalanced || (isLowFat && isLowCal);
+  const highlightClass = danger
+    ? "bg-rose-50 border-rose-100"
+    : positive
+    ? "bg-emerald-50 border-emerald-100"
+    : "bg-slate-50 border-slate-100";
 
   return (
-    <View className="flex-row items-center p-4">
-      <View className="w-10 h-10 rounded-2xl bg-slate-50 items-center justify-center border border-slate-100">
-        <Ionicons name={icon} size={18} color="#1f444c" />
+    <View className={`flex-row items-center p-4 rounded-2xl border ${highlightClass}`}>
+      {/* Dynamic Pop-Icon Container */}
+      <View className="relative">
+        <View className="w-12 h-12 rounded-2xl bg-slate-50 items-center justify-center border border-slate-100">
+          <Ionicons name={icon} size={20} color="#1f444c" />
+        </View>
+
+        {/* The Pop-Icon Overlay */}
+        {meal && (
+          <View className="absolute -top-1 -right-1 shadow-sm">
+            {isHighFat ? (
+              <View className="bg-amber-500 rounded-full w-5 h-5 items-center justify-center border-2 border-white">
+                <Ionicons name="warning" size={10} color="white" />
+              </View>
+            ) : isHealthy ? (
+              <View className="bg-emerald-500 rounded-full w-5 h-5 items-center justify-center border-2 border-white">
+                <Ionicons name="checkmark-sharp" size={10} color="white" />
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
+
       <View className="flex-1 ml-4">
         <View className="flex-row items-center justify-between mb-0.5">
           <Text className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
             {type}
           </Text>
+
+          {/* Detailed Tags */}
           <View className="flex-row gap-1">
             {isHighProtein && (
               <View className="bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
@@ -276,21 +339,75 @@ function MealSlot({
                 </Text>
               </View>
             )}
+            {isHighFat && (
+              <View className="bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100">
+                <Text className="text-[8px] font-black text-amber-600 uppercase">
+                  High Fat
+                </Text>
+              </View>
+            )}
+            {isHighCarb && (
+              <View className="bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                <Text className="text-[8px] font-black text-sky-600 uppercase">
+                  High Carb
+                </Text>
+              </View>
+            )}
             {isLowCarb && (
-              <View className="bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                <Text className="text-[8px] font-black text-blue-600 uppercase">
+              <View className="bg-cyan-50 px-2 py-0.5 rounded-md border border-cyan-100">
+                <Text className="text-[8px] font-black text-cyan-600 uppercase">
                   Low Carb
+                </Text>
+              </View>
+            )}
+            {isLowFat && (
+              <View className="bg-indigo-50 px-2 py-0.5 rounded-md border border-indigo-100">
+                <Text className="text-[8px] font-black text-indigo-600 uppercase">
+                  Low Fat
+                </Text>
+              </View>
+            )}
+            {isHighCal && (
+              <View className="bg-orange-50 px-2 py-0.5 rounded-md border border-orange-100">
+                <Text className="text-[8px] font-black text-orange-600 uppercase">
+                  High Cal
+                </Text>
+              </View>
+            )}
+            {isLowCal && (
+              <View className="bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                <Text className="text-[8px] font-black text-slate-600 uppercase">
+                  Light
+                </Text>
+              </View>
+            )}
+            {isBalanced && (
+              <View className="bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100">
+                <Text className="text-[8px] font-black text-teal-600 uppercase">
+                  Balanced
                 </Text>
               </View>
             )}
           </View>
         </View>
-        <Text
-          numberOfLines={1}
-          className="text-[15px] font-bold text-primary italic leading-5"
-        >
-          {meal?.name || "No meal scheduled"}
-        </Text>
+
+        <View className="flex-row items-center">
+          <Text
+            numberOfLines={1}
+            className={`text-[15px] font-bold italic leading-5 flex-1 ${
+              meal ? "text-primary" : "text-slate-300"
+            }`}
+          >
+            {meal?.name || "No meal scheduled"}
+          </Text>
+
+          {/* Quick Macro Peek */}
+          {meal && (
+            <Text className="text-[10px] font-bold text-slate-400 ml-2">
+              {kcal}kcal
+            </Text>
+          )}
+        </View>
       </View>
     </View>
   );
