@@ -4,29 +4,18 @@ import {
   Text,
   View,
   Image,
-  Pressable,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { Screen } from "../../../components/layout/Screen";
 import { Loading } from "../../../components/ui/Loading";
 import { api } from "../../../lib/api";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-
-const { width } = Dimensions.get("window");
-
-function htmlToText(html?: string): string {
-  if (!html) return "";
-  let s = String(html);
-  s = s.replace(/<br\s*\/?>/gi, "\n");
-  s = s.replace(/<\/p>/gi, "\n\n");
-  s = s.replace(/<li>(.*?)<\/li>/gi, (_, m) => `• ${m}\n`);
-  s = s.replace(/<[^>]+>/g, "");
-  return s.trim();
-}
+import RenderHTML from "react-native-render-html";
 
 export default function RecipeDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { width: contentWidth } = useWindowDimensions();
   const [loading, setLoading] = useState(true);
   const [recipe, setRecipe] = useState<any>(null);
   const [nutrition, setNutrition] = useState<any>(null);
@@ -138,9 +127,31 @@ export default function RecipeDetails() {
               </Text>
             </View>
 
-            <Text className="text-slate-600 font-medium leading-relaxed">
-              {htmlToText(recipe.details) || "No further details provided."}
-            </Text>
+            {recipe?.details ? (
+              <RenderHTML
+                contentWidth={contentWidth}
+                source={{ html: recipe.details || "" }}
+                baseStyle={{ color: "#334155", fontSize: 16, lineHeight: 24 }}
+                tagsStyles={{
+                  p: { marginBottom: 8 },
+                  li: { marginBottom: 6 },
+                  h1: { fontSize: 24, fontWeight: "800", marginBottom: 12 },
+                  h2: { fontSize: 20, fontWeight: "800", marginBottom: 10 },
+                  h3: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
+                  strong: { fontWeight: "700" },
+                  em: { fontStyle: "italic" },
+                  a: { color: "#1f444c", textDecorationLine: "underline" },
+                  img: { maxWidth: "100%", borderRadius: 12 },
+                  ul: { marginBottom: 8, paddingLeft: 16 },
+                  ol: { marginBottom: 8, paddingLeft: 16 },
+                  br: { height: 8 },
+                }}
+              />
+            ) : (
+              <Text className="text-slate-600 font-medium leading-relaxed">
+                No further details provided.
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
