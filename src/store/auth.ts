@@ -80,6 +80,7 @@ export const useAuth = create<State & Actions>((set, get) => ({
   login: async (payload) => {
     set({ loading: true, error: null });
     try {
+      console.log(payload	)
       const { data } = await http.post("/auth/login", payload);
       const token = data?.token as string | undefined;
       const refresh = (data?.refresh_token as string | undefined) || undefined;
@@ -95,7 +96,6 @@ export const useAuth = create<State & Actions>((set, get) => ({
       }
     } catch (e: any) {
       set({ error: e?.response?.data?.message || "Login failed" });
-      console.log(e)
       throw e;
     } finally {
       set({ loading: false });

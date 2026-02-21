@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ScrollView,
   Text,
@@ -15,9 +15,14 @@ import { router, useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
-function stripHtml(html?: string): string {
+function htmlToText(html?: string): string {
   if (!html) return "";
-  return html.replace(/<[^>]+>/g, "");
+  let s = String(html);
+  s = s.replace(/<br\s*\/?>/gi, "\n");
+  s = s.replace(/<\/p>/gi, "\n\n");
+  s = s.replace(/<li>(.*?)<\/li>/gi, (_, m) => `• ${m}\n`);
+  s = s.replace(/<[^>]+>/g, "");
+  return s.trim();
 }
 
 export default function RecipeDetails() {
@@ -134,7 +139,7 @@ export default function RecipeDetails() {
             </View>
 
             <Text className="text-slate-600 font-medium leading-relaxed">
-              {stripHtml(recipe.details) || "No further details provided."}
+              {htmlToText(recipe.details) || "No further details provided."}
             </Text>
           </View>
         </View>
