@@ -15,6 +15,11 @@ import { router, useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
+function stripHtml(html?: string): string {
+  if (!html) return "";
+  return html.replace(/<[^>]+>/g, "");
+}
+
 export default function RecipeDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
@@ -107,17 +112,30 @@ export default function RecipeDetails() {
             </View>
           </View>
 
-          {/* Cooking Process */}
-          <View className="mt-8 mb-20">
-            <Text className="text-[11px] font-black uppercase tracking-[2px] text-slate-400 mb-4 ml-1">
-              Instructions
-            </Text>
-            <View className="bg-white border border-slate-100 p-6 rounded-[32px]">
-              <Text className="text-slate-600 leading-6 font-medium">
-                {recipe?.details?.replace(/<[^>]*>?/gm, "") ||
-                  "No detailed instructions provided."}
+          {recipe.description ? (
+            <View className="mt-6 bg-white border border-slate-100 p-5 rounded-[28px]">
+              <Text className="text-slate-600 text-lg italic">
+                "{recipe.description}"
               </Text>
             </View>
+          ) : null}
+
+          {/* Cooking Process */}
+
+          <View className="mt-6 bg-white border border-slate-100 p-5 rounded-[28px]">
+            <View className="flex-row items-center gap-3 mb-4">
+              <View className="w-10 h-10 rounded-2xl bg-primary/10 items-center justify-center">
+                <Ionicons name="restaurant-outline" size={20} color="#1f444c" />
+              </View>
+
+              <Text className="text-xl font-black uppercase tracking-tighter italic text-primary">
+                Cooking <Text className="text-accent2">Process</Text>
+              </Text>
+            </View>
+
+            <Text className="text-slate-600 font-medium leading-relaxed">
+              {stripHtml(recipe.details) || "No further details provided."}
+            </Text>
           </View>
         </View>
       </ScrollView>

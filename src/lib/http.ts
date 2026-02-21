@@ -7,11 +7,20 @@ export const http = axios.create({
   timeout: 15000,
 });
 
+let accessToken: string | null = null;
+let refreshToken: string | null = null;
+
+export const setAccessToken = (token: string | null) => {
+  accessToken = token || null;
+};
+export const setRefreshToken = (token: string | null) => {
+  refreshToken = token || null;
+};
+
 http.interceptors.request.use(async (config) => {
   try {
-    const token = await AsyncStorage.getItem(STORAGE_KEYS.token);
+    const token = accessToken || (await AsyncStorage.getItem(STORAGE_KEYS.token));
     if (token) {
-      // Ensure headers exists and then mutate to avoid typing issues
       (config.headers as any) = (config.headers as any) || {};
       (config.headers as any).Authorization = `Bearer ${token}`;
     }
@@ -36,7 +45,7 @@ http.interceptors.response.use(
       try {
         if (!refreshPromise) {
           refreshPromise = (async () => {
-            const rt = await AsyncStorage.getItem(STORAGE_KEYS.refresh);
+            const rt = refreshToken || (await AsyncStorage.getItem(STORAGE_KEYS.refresh));
             if (!rt) return null;
             const { data } = await axios.post(
               `${API_BASE_URL.replace(/\/$/, "")}/auth/refresh`,
@@ -47,6 +56,8 @@ http.interceptors.response.use(
             const newRefresh = data?.refresh_token as string | undefined;
             if (newAccess) await AsyncStorage.setItem(STORAGE_KEYS.token, newAccess);
             if (newRefresh) await AsyncStorage.setItem(STORAGE_KEYS.refresh, newRefresh);
+            if (newAccess) setAccessToken(newAccess);
+            if (newRefresh) setRefreshToken(newRefresh);
             return newAccess || null;
           })().finally(() => {
             refreshPromise = null;

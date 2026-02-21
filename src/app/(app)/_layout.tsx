@@ -109,7 +109,7 @@ export default function AppTabsLayout() {
             tabBarLabel: "Recipes",
             tabBarIcon: ({ color }) => (
               <Ionicons
-                name="ellipsis-horizontal-circle-outline"
+                name="restaurant-outline"
                 size={22}
                 color={color}
               />

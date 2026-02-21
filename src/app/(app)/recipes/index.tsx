@@ -1,12 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  View,
-  TextInput,
-  Image,
-  Pressable,
-} from "react-native";
+import { ScrollView, Text, View, TextInput, Image, Pressable, FlatList } from "react-native";
 import { Screen } from "../../../components/layout/Screen";
 import { Loading } from "../../../components/ui/Loading";
 import { ErrorView } from "../../../components/ui/ErrorView";
@@ -72,35 +65,27 @@ export default function Recipes() {
               </Text>
             </View>
           ) : (
-            <View className="flex-row flex-wrap justify-between">
-              {filtered.map((r) => (
+            <FlatList
+              data={filtered}
+              numColumns={2}
+              keyExtractor={(item) => String(item.id)}
+              columnWrapperStyle={{ justifyContent: "space-between" }}
+              renderItem={({ item: r }) => (
                 <Pressable
-                  key={r.id}
                   onPress={() => router.push(`/(app)/recipes/${r.id}`)}
                   className="w-[48%] mb-6 rounded-[32px] overflow-hidden bg-white border border-slate-100 shadow-sm shadow-slate-200"
                 >
                   <View className="h-40 w-full bg-slate-100">
                     {r.image_url ? (
-                      <Image
-                        source={{ uri: r.image_url }}
-                        style={{ width: "100%", height: "100%" }}
-                        resizeMode="cover"
-                      />
+                      <Image source={{ uri: r.image_url }} style={{ width: "100%", height: "100%" }} resizeMode="cover" />
                     ) : (
                       <View className="w-full h-full items-center justify-center">
-                        <Ionicons
-                          name="fast-food-outline"
-                          size={40}
-                          color="#cbd5e1"
-                        />
+                        <Ionicons name="fast-food-outline" size={40} color="#cbd5e1" />
                       </View>
                     )}
                   </View>
                   <View className="p-4">
-                    <Text
-                      numberOfLines={2}
-                      className="font-black text-sm text-primary uppercase italic leading-tight mb-2"
-                    >
+                    <Text numberOfLines={2} className="font-black text-sm text-primary uppercase italic leading-tight mb-2">
                       {r.name}
                     </Text>
                     <View className="flex-row items-center">
@@ -111,8 +96,8 @@ export default function Recipes() {
                     </View>
                   </View>
                 </Pressable>
-              ))}
-            </View>
+              )}
+            />
           )}
         </View>
       </ScrollView>

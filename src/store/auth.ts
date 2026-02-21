@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { http } from "../lib/http";
+import { http, setAccessToken, setRefreshToken } from "../lib/http";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { STORAGE_KEYS } from "../config";
 
@@ -43,6 +43,7 @@ export const useAuth = create<State & Actions>((set, get) => ({
     try {
       const token = await AsyncStorage.getItem(STORAGE_KEYS.token);
       if (token) {
+        setAccessToken(token);
         set({ token });
         await get().fetchMe().catch(() => {});
       }
@@ -85,6 +86,8 @@ export const useAuth = create<State & Actions>((set, get) => ({
       if (token) {
         await AsyncStorage.setItem(STORAGE_KEYS.token, token);
         if (refresh) await AsyncStorage.setItem(STORAGE_KEYS.refresh, refresh);
+        setAccessToken(token);
+        if (refresh) setRefreshToken(refresh);
         set({ token });
         await get().fetchMe();
       } else {
@@ -105,6 +108,8 @@ export const useAuth = create<State & Actions>((set, get) => ({
     } finally {
       await AsyncStorage.removeItem(STORAGE_KEYS.token);
       await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
+      setAccessToken(null);
+      setRefreshToken(null);
       set({ token: null, user: null });
     }
   },
@@ -115,6 +120,8 @@ export const useAuth = create<State & Actions>((set, get) => ({
     } finally {
       await AsyncStorage.removeItem(STORAGE_KEYS.token);
       await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
+      setAccessToken(null);
+      setRefreshToken(null);
       set({ token: null, user: null });
     }
   },
@@ -152,6 +159,8 @@ export const useAuth = create<State & Actions>((set, get) => ({
       // If unauthorized, clear session
       await AsyncStorage.removeItem(STORAGE_KEYS.token);
       await AsyncStorage.removeItem(STORAGE_KEYS.refresh);
+      setAccessToken(null);
+      setRefreshToken(null);
       set({ token: null, user: null });
     } finally {
       set({ loading: false });
