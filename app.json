@@ -2,7 +2,7 @@
   "expo": {
     "name": "Bunzi Meal Planner",
     "slug": "didactic-palm-tree",
-    "scheme": "acme",
+    "scheme": "bunzimeal",
     "userInterfaceStyle": "automatic",
     "orientation": "default",
     "web": {
@@ -16,7 +16,7 @@
         }
       ]
     ],
-    "icon": "src/assets/images/logo.jpg",
+    "icon": "src/assets/images/logo.png",
     "splash": {
       "image": "src/assets/images/logo.jpg",
       "backgroundColor": "#1f444c",
@@ -28,7 +28,7 @@
       "barStyle": "light-content"
     },
     "android": {
-      "package": "com.peace.didacticpalmtree",
+      "package": "com.bunzi.bunzimeal",
       "adaptiveIcon": {
         "backgroundColor": "#1f444c"
       }
