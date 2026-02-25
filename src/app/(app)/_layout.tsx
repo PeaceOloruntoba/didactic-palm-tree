@@ -48,12 +48,12 @@ export default function AppTabsLayout() {
             fontWeight: "900",
             textTransform: "uppercase",
             letterSpacing: 1.5,
-            fontSize: 15,
+            fontSize: 17,
             fontStyle: "italic",
             color: "#e9be6f",
           },
-          tabBarActiveTintColor: "#e9be6f",
-          tabBarInactiveTintColor: "rgba(233, 190, 111, 0.4)", // Faded version of your gold
+          tabBarActiveTintColor: "#ffd27a",
+          tabBarInactiveTintColor: "rgba(255, 210, 122, 0.6)",
           tabBarStyle: {
             height: 85,
             backgroundColor: "#1f444c",
@@ -63,7 +63,7 @@ export default function AppTabsLayout() {
             paddingBottom: 25,
           },
           tabBarLabelStyle: {
-            fontSize: 10,
+            fontSize: 12,
             fontWeight: "900",
             textTransform: "uppercase",
             letterSpacing: 1,
@@ -77,7 +77,7 @@ export default function AppTabsLayout() {
             title: "Dashboard",
             tabBarLabel: "Home",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="grid-outline" size={22} color={color} />
+              <Ionicons name="grid-outline" size={24} color={color} />
             ),
             headerRight: () => (
               <Pressable
@@ -96,7 +96,7 @@ export default function AppTabsLayout() {
             title: "Bunzi AI",
             tabBarLabel: "AI Chat",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="sparkles-outline" size={22} color={color} />
+              <Ionicons name="sparkles-outline" size={24} color={color} />
             ),
           }}
         />
@@ -110,7 +110,7 @@ export default function AppTabsLayout() {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="restaurant-outline"
-                size={22}
+                size={24}
                 color={color}
               />
             ),
@@ -123,7 +123,7 @@ export default function AppTabsLayout() {
             title: "Kitchen",
             tabBarLabel: "Pantry",
             tabBarIcon: ({ color }) => (
-              <Ionicons name="basket-outline" size={22} color={color} />
+              <Ionicons name="basket-outline" size={24} color={color} />
             ),
           }}
         />
@@ -137,7 +137,7 @@ export default function AppTabsLayout() {
             tabBarIcon: ({ color }) => (
               <Ionicons
                 name="ellipsis-horizontal-circle-outline"
-                size={22}
+                size={24}
                 color={color}
               />
             ),
