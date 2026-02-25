@@ -292,6 +292,8 @@ export default function Billing() {
           <View className="gap-4">
             {plans.map((p) => {
               const isAnnual = p.plan === "annual";
+              const isQuarterly = p.plan === "quarterly";
+              const isBiannual = p.plan === "biannual";
               return (
                 <Pressable
                   key={p.plan}
@@ -316,6 +318,20 @@ export default function Billing() {
                           </Text>
                         </View>
                       )}
+                      {isQuarterly && (
+                        <View className="bg-primary/10 px-2 py-0.5 rounded-md ml-2">
+                          <Text className="text-[9px] font-black uppercase text-primary">
+                            Quarterly Discount
+                          </Text>
+                        </View>
+                      )}
+                      {isBiannual && (
+                        <View className="bg-primary/10 px-2 py-0.5 rounded-md ml-2">
+                          <Text className="text-[9px] font-black uppercase text-primary">
+                            Biannual Discount
+                          </Text>
+                        </View>
+                      )}
                     </View>
                     <Text className="text-2xl font-black text-primary">
                       {(p.price_cents / 100).toLocaleString(undefined, {
@@ -327,6 +343,32 @@ export default function Billing() {
                     <Text className="text-slate-400 text-xs font-medium">
                       Billed {p.plan}
                     </Text>
+                    <View className="mt-3">
+                      <View className="flex-row items-center gap-2 mb-1">
+                        <Ionicons name="chatbubble-ellipses-outline" size={14} color="#e9be6f" />
+                        <Text className="text-[12px] font-semibold text-slate-600">
+                          AI Chat Assistant
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center gap-2 mb-1">
+                        <Ionicons name="medkit-outline" size={14} color="#e9be6f" />
+                        <Text className="text-[12px] font-semibold text-slate-600">
+                          Dietician Guidance
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center gap-2 mb-1">
+                        <Ionicons name="nutrition-outline" size={14} color="#e9be6f" />
+                        <Text className="text-[12px] font-semibold text-slate-600">
+                          Nutritionist Insights
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center gap-2">
+                        <Ionicons name="calendar-outline" size={14} color="#e9be6f" />
+                        <Text className="text-[12px] font-semibold text-slate-600">
+                          AI Meal Planner
+                        </Text>
+                      </View>
+                    </View>
                   </View>
 
                   <View
